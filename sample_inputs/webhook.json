@@ -1,0 +1,8 @@
+{
+  "id": 101,
+  "type": "order_created",
+  "payload": {
+    "item": "Laptop",
+    "price": 1200
+  }
+}

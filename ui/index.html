@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Multi-Format AI System Upload</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    button {
+      margin-left: 10px;
+      padding: 0.5rem 1rem;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 1rem;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    .error {
+      color: red;
+    }
+    .info {
+      color: blue;
+    }
+    a#logsLink {
+      display: inline-block;
+      margin-top: 1rem;
+      text-decoration: none;
+      color: #007bff;
+      font-weight: bold;
+    }
+    a#logsLink:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<h2>Multi-Format AI System - Upload Input</h2>
+
+<input type="file" id="fileInput" />
+<button id="uploadBtn">Upload & Process</button>
+
+<p id="status"></p>
+<pre id="result"></pre>
+
+<!-- Logs Link -->
+<a href="http://localhost:8000/logs/" target="_blank" id="logsLink">View Logs</a>
+
+<script>
+  const fileInput = document.getElementById('fileInput');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const statusEl = document.getElementById('status');
+  const resultEl = document.getElementById('result');
+
+  async function uploadWithRetry(file, retries = 3, delay = 1000) {
+    let attempt = 0;
+    while (attempt < retries) {
+      try {
+        statusEl.textContent = `Uploading and processing... (Attempt ${attempt + 1} of ${retries})`;
+        statusEl.className = 'info';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('http://localhost:8000/process/', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+        return data;
+
+      } catch (err) {
+        attempt++;
+        if (attempt >= retries) {
+          throw err;
+        }
+        await new Promise(res => setTimeout(res, delay));
+        delay *= 2; // exponential backoff
+      }
+    }
+  }
+
+  uploadBtn.addEventListener('click', async () => {
+    statusEl.textContent = '';
+    statusEl.className = '';
+    resultEl.textContent = '';
+
+    const file = fileInput.files[0];
+    if (!file) {
+      statusEl.textContent = 'Please select a file first.';
+      statusEl.className = 'error';
+      return;
+    }
+
+    try {
+      const result = await uploadWithRetry(file);
+      statusEl.textContent = 'Upload and processing succeeded!';
+      statusEl.className = 'info';
+      resultEl.textContent = JSON.stringify(result, null, 2);
+    } catch (err) {
+      statusEl.textContent = 'Upload failed after multiple attempts: ' + err.message;
+      statusEl.className = 'error';
+    }
+  });
+</script>
+</body>
+</html>

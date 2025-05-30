@@ -1,0 +1,12 @@
+From: jane.doe@example.com
+To: support@company.com
+Subject: URGENT: Complaint about delayed shipment
+
+Dear Support Team,
+
+I am very disappointed with the delay in my shipment. It was supposed to arrive last week, but I have heard nothing. This is unacceptable!
+
+Please escalate this issue immediately.
+
+Best regards,
+Jane Doe

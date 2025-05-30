@@ -1,0 +1,7 @@
+{
+  "orderId": 12345,
+  "customer": "John Doe",
+  "items": "Widget A, Widget B",
+  "total": "1749.85",
+  "status": "pending"
+}

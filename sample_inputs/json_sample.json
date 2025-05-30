@@ -1,0 +1,10 @@
+{
+  "orderId": "12345",
+  "customer": "John Doe",
+  "items": [
+    { "product": "Widget A", "quantity": 10, "price": 99.99 },
+    { "product": "Widget B", "quantity": 5, "price": 149.99 }
+  ],
+  "total": 1749.85,
+  "status": "pending"
+}

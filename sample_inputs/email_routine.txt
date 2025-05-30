@@ -1,0 +1,10 @@
+From: mark.smith@example.com
+To: support@company.com
+Subject: Question about product features
+
+Hello Support Team,
+
+I have a few questions regarding the new features of your Widget Pro. Could you please provide more information at your earliest convenience?
+
+Thank you,
+Mark Smith
