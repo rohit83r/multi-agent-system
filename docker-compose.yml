@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  multi-agent-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: multi-agent-app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./output_logs:/app/output_logs
+      - ./sample_inputs:/app/sample_inputs
+    env_file:
+      - .env
+    restart: unless-stopped

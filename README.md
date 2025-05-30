@@ -1,34 +1,130 @@
 # Multi-Format Autonomous AI System with Contextual Decisioning & Chained Actions
 
-## Project Overview
-This system processes multi-format inputs (Email, JSON, PDF), classifies both format and business intent, routes the data to specialized agents for detailed extraction and validation, and triggers follow-up actions dynamically. All interactions and decisions are logged in a shared memory store for auditability.
+## 🔥 Project Overview
 
-## Architecture
+This system is a multi-agent architecture capable of processing inputs from Emails, PDFs, and JSON webhooks. It uses classification to route inputs to specialized agents and dynamically triggers follow-up actions based on content analysis.
 
-![Architecture Diagram](./diagram.png)
+### 🧠 Core Agents
 
-- **Classifier Agent**: Detects input format (Email, JSON, PDF) and business intent (RFQ, Complaint, Invoice, Regulation, Fraud Risk) using few-shot learning with LangChain/OpenAI.
-- **Email Agent**: Extracts sender, urgency, issue/request, and analyzes tone to decide escalation or closure.
-- **JSON Agent**: Validates webhook JSON schema and flags anomalies.
-- **PDF Agent**: Extracts invoice or policy details, flags high invoice totals and compliance terms.
-- **Shared Memory Store**: SQLite database storing logs of inputs, classification results, agent outputs, and action traces.
-- **Action Router**: Triggers follow-up actions (e.g., CRM escalation, risk alerts) with retry logic and logs outcomes.
+* **Classifier Agent**
 
-## Tech Stack
-- Python 3.10+
-- FastAPI for REST endpoints
-- LangChain/OpenAI for classification & extraction
-- PyPDF2 for PDF parsing
-- SQLite for shared memory
-- Requests for HTTP action routing
+   * Detects input format: `Email`, `JSON`, `PDF`
+   * Detects business intent: `RFQ`, `Complaint`, `Invoice`, `Regulation`, `Fraud Risk`
+   * Uses few-shot examples + LangChain/OpenAI
 
-## Setup Instructions
-1. Install dependencies:
+* **Email Agent**
+
+   * Extracts: `sender`, `urgency`, `issue/request`
+   * Analyzes tone: `angry`, `polite`, `escalation`
+   * Routes:
+
+      * Urgent & angry → `POST /crm/escalate`
+      * Routine → Log and close
+
+* **JSON Agent**
+
+   * Validates incoming JSON schema
+   * Flags anomalies: type mismatches, missing fields
+   * Alerts logged via memory or `POST /risk_alert`
+
+* **PDF Agent**
+
+   * Parses invoices or policies
+   * Flags:
+
+      * Invoices > 10,000
+      * Mentions of compliance terms like `GDPR`, `FDA`
+
+* **Shared Memory Store (SQLite)**
+
+   * Stores:
+
+      * Input metadata (source, timestamp)
+      * Agent outputs and extracted fields
+      * Triggered actions and decision traces
+
+* **Action Router**
+
+   * Analyzes agent outputs
+   * Triggers simulated actions via REST:
+
+      * `/crm/escalate`
+      * `/risk_alert`
+   * Includes retry logic and logs results
+
+---
+
+## 🧰 Tech Stack
+
+* **Language**: Python 3.10+
+* **Framework**: FastAPI
+* **LLM & Routing**: LangChain + OpenAI
+* **PDF Parsing**: PyPDF2
+* **Database**: SQLite
+* **Shared Memory**: File-based SQLite
+* **API Calls**: `requests` library
+
+---
+
+## 🐳 Running the System (via Docker Compose)
+
+1. Clone the repository:
+
    ```bash
-   pip install fastapi uvicorn langchain pydantic PyPDF2 requests reportlab textblob
-
-2. ENV file  
-   Gemini API Key
-   ```bash
-   GEMINI_API_KEY="your_gemini_api_key"
+   git clone https://github.com/yourname/multi-format-agent-system
+   cd multi-format-agent-system
    ```
+
+2. Build and run all services:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+3. Access endpoints:
+
+   * API Sim: [http://localhost:8000](http://localhost:8000)
+   * UI : open index.html in browser 
+
+---
+
+## 📁 Directory Structure
+
+```
+multi-agent-system/
+├── agents/
+│   ├── classifier.py
+│   ├── email_agent.py
+│   ├── json_agent.py
+│   ├── pdf_agent.py
+├── utils/
+│   └── memory.py
+├── router/
+│   └── action_router.py
+├── main.py (FastAPI app)
+├── ui/
+│   └── index.html
+├── docker-compose.yml
+├── Dockerfile
+├── README.md
+├── sample_inputs/
+
+```
+
+---
+
+## 📄 Sample Inputs
+
+* `sample_email.txt` (urgent, angry tone)
+* `sample.json` (webhook event)
+* `invoice.pdf`, `policy.pdf`
+
+---
+
+## ✅ Output Examples
+
+* Classification Logs (SQLite)
+* REST Logs (action trace)
+* Screenshots of agent output decisions
+
+---
